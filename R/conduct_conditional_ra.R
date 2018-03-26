@@ -16,7 +16,7 @@ conduct_conditional_ra <-
 
     assignment_vec_new <- assignment_vec
 
-    if (declaration$ra_type == "simple") {
+    if (inherits(declaration, "ra_simple") || declaration$ra_type == "simple") {
       prob_each_local <-
         declaration$probabilities_matrix[1, paste0("prob_", conditions)]
       prob_each_local <- prob_each_local / (sum(prob_each_local))
@@ -26,12 +26,12 @@ conduct_conditional_ra <-
         simple_ra(
           N = sum(assignment_vec %in% conditions),
           prob_each = prob_each_local,
-          condition_names = conditions,
+          conditions = conditions,
           check_inputs = FALSE
         )
     }
 
-    if (declaration$ra_type == "complete") {
+    if (inherits(declaration, "ra_complete") || declaration$ra_type == "complete") {
       prob_each_local <-
         declaration$probabilities_matrix[1, paste0("prob_", conditions)]
       prob_each_local <- prob_each_local / (sum(prob_each_local))
@@ -40,12 +40,12 @@ conduct_conditional_ra <-
         complete_ra(
           N = sum(assignment_vec %in% conditions),
           prob_each = prob_each_local,
-          condition_names = conditions,
+          conditions = conditions,
           check_inputs = FALSE
         )
     }
 
-    if (declaration$ra_type == "blocked") {
+    if (inherits(declaration, "ra_blocked") || declaration$ra_type == "blocked") {
       block_prob_each_local <- by(
         declaration$probabilities_matrix,
         INDICES = declaration$blocks,
@@ -61,12 +61,12 @@ conduct_conditional_ra <-
         block_ra(
           blocks = declaration$blocks[assignment_vec %in% conditions],
           block_prob_each = block_prob_each_local,
-          condition_names = conditions,
+          conditions = conditions,
           check_inputs = FALSE
         )
     }
 
-    if (declaration$ra_type == "clustered") {
+    if (inherits(declaration, "ra_clustered") || declaration$ra_type == "clustered") {
       prob_each_local <-
         declaration$probabilities_matrix[1, paste0("prob_", conditions)]
       prob_each_local <- prob_each_local / (sum(prob_each_local))
@@ -75,12 +75,12 @@ conduct_conditional_ra <-
         cluster_ra(
           clusters = declaration$clusters[assignment_vec %in% conditions],
           prob_each = prob_each_local,
-          condition_names = conditions,
+          conditions = conditions,
           check_inputs = FALSE
         )
     }
 
-    if (declaration$ra_type == "blocked_and_clustered") {
+    if (inherits(declaration, "ra_blocked_and_clustered") || declaration$ra_type == "blocked_and_clustered") {
       block_prob_each_local <- by(
         declaration$probabilities_matrix,
         INDICES = declaration$blocks,
@@ -99,7 +99,7 @@ conduct_conditional_ra <-
           blocks = declaration$blocks[assignment_vec %in% conditions],
           clusters = declaration$clusters[assignment_vec %in% conditions],
           block_prob_each = block_prob_each_local,
-          condition_names = conditions,
+          conditions = conditions,
           check_inputs = FALSE
         )
     }
