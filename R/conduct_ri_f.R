@@ -20,14 +20,19 @@ conduct_ri_f <- function(model_1,
   design_matrix_2 <- model.matrix.default(model_2, data = data)
 
   if (nrow(design_matrix_1) != nrow(design_matrix_2)) {
-    stop("Missigness!")
-  }
-  if (all.vars(model_1[[2]]) != all.vars(model_2[[2]])) {
-    stop("Outcome Match!")
+    stop("The number of complete observations must be the same in both models.")
   }
 
-  assignment_vec <- data[, assignment]
-  outcome_vec <- data[, all.vars(model_1[[2]])]
+  outcome_name <- all.vars(model_1[[2]])
+  if (outcome_name != all.vars(model_2[[2]])) {
+    stop("The outcome variable must be the same in both models.")
+  }
+  if(! outcome_name %in% names(data)){
+    stop(paste0("Outcome variable ", outcome_name, " not found in data."))
+  }
+
+  assignment_vec <- data[[assignment]]
+  outcome_vec <- data[[outcome_name]]
 
   # The observed value ------------------------------------------------------
 
@@ -39,8 +44,8 @@ conduct_ri_f <- function(model_1,
   }
 
   coefs_obs_1 <-
-    estimatr::tidy.lm_robust(lm_robust_fit(
-      y = outcome_vec,
+    tidy(lm_robust_fit(
+      y = matrix(outcome_vec, dimnames = list(NULL, outcome_name)),
       X = design_matrix_1,
       weights = weights_vec,
       ci = FALSE,
@@ -60,8 +65,8 @@ conduct_ri_f <- function(model_1,
   coefs_obs_1 <- coefs_obs_1[coefs_obs_1[[jx]] %in% colnames(design_matrix_1), beta_ix, drop = TRUE]
 
   coefs_obs_2 <-
-    estimatr::tidy.lm_robust(lm_robust_fit(
-      y = outcome_vec,
+    tidy(lm_robust_fit(
+      y = matrix(outcome_vec, dimnames = list(NULL, outcome_name)),
       X = design_matrix_2,
       weights = weights_vec,
       ci = FALSE,
@@ -125,8 +130,8 @@ conduct_ri_f <- function(model_1,
     }
 
     coefs_sim_1 <-
-      estimatr::tidy.lm_robust(lm_robust_fit(
-        y = outcome_vec_sim,
+      tidy(lm_robust_fit(
+        y = matrix(outcome_vec_sim, dimnames = list(NULL, outcome_name)),
         X = design_matrix_sim_1,
         weights = weights_vec,
         ci = FALSE,
@@ -141,8 +146,8 @@ conduct_ri_f <- function(model_1,
     coefs_sim_1 <- coefs_sim_1[coefs_sim_1[[jx]] %in% colnames(design_matrix_sim_1), beta_ix, drop = TRUE]
 
     coefs_sim_2 <-
-      estimatr::tidy.lm_robust(lm_robust_fit(
-        y = outcome_vec_sim,
+      tidy(lm_robust_fit(
+        y = matrix(outcome_vec_sim, dimnames = list(NULL, outcome_name)),
         X = design_matrix_sim_2,
         weights = weights_vec,
         ci = FALSE,
@@ -177,7 +182,7 @@ conduct_ri_f <- function(model_1,
     data.frame(
       est_sim = null_distribution,
       est_obs = f_obs,
-      coefficient = "F-statistic"
+      term = "F-statistic"
     )
 
   return(structure(list(sims_df = sims_df),

@@ -22,10 +22,12 @@
 #' @param data A data.frame.
 #' @param sims the number of simulations. Defaults to 1000.
 #' @param progress_bar logical, defaults to FALSE.  Should a progress bar be displayed in the console?
+#' @param p Should "two-tailed", "upper", or "lower" p-values be reported? Defaults to "two-tailed"
 #'
 #' @export
 #'
 #' @importFrom randomizr declare_ra conduct_ra obtain_condition_probabilities
+#' @importFrom estimatr lm_robust_fit tidy
 #'
 #' @examples
 #'
@@ -50,6 +52,7 @@
 #'
 #' summary(out)
 #' plot(out)
+#' tidy(out)
 #'
 #' # Randomization Inference for an Interaction
 #'
@@ -80,6 +83,8 @@
 #' summary(out, p = "two-tailed")
 #' summary(out, p = "upper")
 #' summary(out, p = "lower")
+#'
+#' tidy(out)
 #'
 #' # Randomization Inference for arbitrary test statistics
 #'
@@ -115,6 +120,7 @@
 #'
 #' plot(out)
 #' summary(out)
+#' tidy(out)
 #'
 conduct_ri <- function(formula = NULL,
                        model_1 = NULL,
@@ -131,7 +137,8 @@ conduct_ri <- function(formula = NULL,
                        permutation_matrix = NULL,
                        data,
                        sims = 1000,
-                       progress_bar = FALSE) {
+                       progress_bar = FALSE,
+                       p = "two-tailed") {
   # some error checking -----------------------------------------------------
 
   if (is.null(declaration) &
@@ -141,6 +148,9 @@ conduct_ri <- function(formula = NULL,
   if (is.null(declaration) & !is.null(permutation_matrix)) {
     declaration <- randomizr::declare_ra(permutation_matrix = permutation_matrix)
     permutation_matrix <- NULL
+  }
+  if(!assignment %in% names(data)) {
+    stop(paste0("Assignment variable ", assignment, " not found in data."))
   }
 
   # Case 1: ATE -------------------------------------------------------------
@@ -211,6 +221,9 @@ conduct_ri <- function(formula = NULL,
       est_obs <- round(est_obs, 10)
     })
 
+
+  ri_out$p <- p
+
   return(ri_out)
 }
 
@@ -218,7 +231,8 @@ conduct_ri <- function(formula = NULL,
 #' @import ggplot2
 #'
 #'
-plot.ri <- function(x, p = "two-tailed", ...) {
+plot.ri <- function(x, p = NULL, ...) {
+  if(is.null(p)){p <- x$p}
   if (p == "two-tailed") {
     x$sims_df <-
       within(
@@ -253,11 +267,11 @@ plot.ri <- function(x, p = "two-tailed", ...) {
     }
 
 
-  summary_df <- split(x$sims_df, x$sims_df$coefficient)
+  summary_df <- split(x$sims_df, x$sims_df$term)
   summary_df <- lapply(summary_df[lapply(summary_df, nrow) != 0], FUN = summary_fun)
   summary_df <- do.call(rbind, summary_df)
 
-  summary_df$coefficient <- rownames(summary_df)
+  summary_df$term <- rownames(summary_df)
 
   ggplot(x$sims_df, aes(x = est_sim, alpha = extreme)) +
     geom_histogram(bins = max(30, nrow(x$sims_df) / 20)) +
@@ -273,7 +287,7 @@ plot.ri <- function(x, p = "two-tailed", ...) {
     scale_alpha_manual(values = c(0.5, 1), guide = FALSE) +
     xlab("Simulated Estimates") +
     ggtitle("Randomization Inference") +
-    facet_wrap(~ coefficient) +
+    facet_wrap(~ term) +
     theme_bw() +
     theme(
       legend.position = "bottom",
@@ -282,14 +296,15 @@ plot.ri <- function(x, p = "two-tailed", ...) {
 }
 
 #' @export
-print.ri <- function(x, p = "two-tailed", ...) {
+print.ri <- function(x, p = NULL, ...) {
   print(summary(x, p))
   invisible(summary(x, p))
 }
 
 #' @export
 #' @importFrom stats quantile
-summary.ri <- function(object, p = "two-tailed", ...) {
+summary.ri <- function(object, p = NULL, ...) {
+  if(is.null(p)){p <- object$p}
   if (p == "two-tailed") {
     object$sims_df <-
       within(
@@ -319,25 +334,21 @@ summary.ri <- function(object, p = "two-tailed", ...) {
         dat,
         data.frame(
           estimate = unique(est_obs),
-          p_value = mean(extreme),
-          null_ci_lower = quantile(est_sim, 0.025),
-          null_ci_upper = quantile(est_sim, 0.975)
+          p_value = mean(extreme)
         )
       )
     }
 
-  return_df <- split(object$sims_df, object$sims_df$coefficient)
+  return_df <- split(object$sims_df, object$sims_df$term)
   return_df <- lapply(return_df[lapply(return_df, nrow) != 0], FUN = summary_fun)
   return_df <- do.call(rbind, return_df)
-  return_df$coefficient <- rownames(return_df)
+  return_df$term <- rownames(return_df)
   rownames(return_df) <- NULL
   return_df <-
     return_df[, c(
-      "coefficient",
+      "term",
       "estimate",
-      "p_value",
-      "null_ci_lower",
-      "null_ci_upper"
+      "p_value"
     )]
 
 
@@ -349,4 +360,11 @@ summary.ri <- function(object, p = "two-tailed", ...) {
     colnames(return_df)[3] <- "upper_p_value"
   }
   return(return_df)
+}
+
+#' @export
+tidy.ri <- function(x, ...) {
+  ret <- summary(x)
+  colnames(ret)[3] <- "p.value"
+  ret
 }

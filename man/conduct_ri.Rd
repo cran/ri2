@@ -8,7 +8,8 @@ conduct_ri(formula = NULL, model_1 = NULL, model_2 = NULL,
   test_function = NULL, assignment = "Z", outcome = NULL,
   declaration = NULL, sharp_hypothesis = 0, studentize = FALSE,
   IPW = TRUE, IPW_weights = NULL, sampling_weights = NULL,
-  permutation_matrix = NULL, data, sims = 1000, progress_bar = FALSE)
+  permutation_matrix = NULL, data, sims = 1000, progress_bar = FALSE,
+  p = "two-tailed")
 }
 \arguments{
 \item{formula}{an object of class formula, as in \code{\link{lm}}. Use formula when conducting significance tests of an Average Treatment Effect estimate under a sharp null hypothesis. For the difference-in-means estimate, do not include covariates. For the OLS covariate-adjusted estimate, include covariates.}
@@ -42,6 +43,8 @@ conduct_ri(formula = NULL, model_1 = NULL, model_2 = NULL,
 \item{sims}{the number of simulations. Defaults to 1000.}
 
 \item{progress_bar}{logical, defaults to FALSE.  Should a progress bar be displayed in the console?}
+
+\item{p}{Should "two-tailed", "upper", or "lower" p-values be reported? Defaults to "two-tailed"}
 }
 \description{
 This function makes it easy to conduct three kinds of randomization inference.
@@ -74,6 +77,7 @@ out <- conduct_ri(y ~ d,
 
 summary(out)
 plot(out)
+tidy(out)
 
 # Randomization Inference for an Interaction
 
@@ -104,6 +108,8 @@ summary(out)
 summary(out, p = "two-tailed")
 summary(out, p = "upper")
 summary(out, p = "lower")
+
+tidy(out)
 
 # Randomization Inference for arbitrary test statistics
 
@@ -139,5 +145,6 @@ out <-
 
 plot(out)
 summary(out)
+tidy(out)
 
 }
