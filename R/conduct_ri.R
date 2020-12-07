@@ -22,7 +22,7 @@
 #' @param data A data.frame.
 #' @param sims the number of simulations. Defaults to 1000.
 #' @param progress_bar logical, defaults to FALSE.  Should a progress bar be displayed in the console?
-#' @param p Should "two-tailed", "upper", or "lower" p-values be reported? Defaults to "two-tailed"
+#' @param p Should "two-tailed", "upper", or "lower" p-values be reported? Defaults to "two-tailed".  For two-tailed p-values, whether or not a simulated value is as large or larger than the observed value is determined with respect to the distance to the sharp null.
 #'
 #' @export
 #'
@@ -45,14 +45,32 @@
 #'
 #' ## Conduct Randomization Inference
 #' out <- conduct_ri(y ~ d,
-#'                       declaration = declaration,
-#'                       assignment = "d",
-#'                       sharp_hypothesis = 0,
-#'                       data = table_2.2)
+#'                   declaration = declaration,
+#'                   assignment = "d",
+#'                   sharp_hypothesis = 0,
+#'                   data = table_2.2)
 #'
 #' summary(out)
 #' plot(out)
 #' tidy(out)
+#'
+#' # Using a custom permutation matrix
+#'
+#' permutation_matrix <-
+#'  matrix(c(0, 0, 0, 0, 0, 0, 1,
+#'           0, 0, 0, 0, 0, 1, 0,
+#'           0, 0, 0, 0, 1, 0, 0,
+#'           0, 0, 0, 1, 0, 0, 0,
+#'           0, 0, 1, 0, 0, 0, 0,
+#'           0, 1, 0, 0, 0, 0, 0,
+#'           1, 0, 0, 0, 0, 0, 0),
+#'         ncol = 7)
+#'
+#' conduct_ri(y ~d, assignment = "d", data = table_2.2,
+#'                    permutation_matrix = permutation_matrix)
+#'
+#'
+#'
 #'
 #' # Randomization Inference for an Interaction
 #'
@@ -223,6 +241,7 @@ conduct_ri <- function(formula = NULL,
 
 
   ri_out$p <- p
+  ri_out$sharp_hypothesis <- sharp_hypothesis
 
   return(ri_out)
 }
@@ -237,7 +256,7 @@ plot.ri <- function(x, p = NULL, ...) {
     x$sims_df <-
       within(
         x$sims_df,
-        extreme <- abs(est_sim) >= abs(est_obs)
+        extreme <- abs(est_sim - x$sharp_hypothesis) >= abs(est_obs - x$sharp_hypothesis)
       )
   } else if (p == "lower") {
     x$sims_df <-
@@ -309,7 +328,7 @@ summary.ri <- function(object, p = NULL, ...) {
     object$sims_df <-
       within(
         object$sims_df,
-        extreme <- abs(est_sim) >= abs(est_obs)
+        extreme <- abs(est_sim - object$sharp_hypothesis) >= abs(est_obs - object$sharp_hypothesis)
       )
   } else if (p == "lower") {
     object$sims_df <-
