@@ -1,9 +1,9 @@
-3811d0143fe9b054162ac1cb0d927394 *DESCRIPTION
+4053684ec2da740480e15276e1ab17cf *DESCRIPTION
 3a3ba5ac006052850a6d26197d50884a *LICENSE
 7889d148a3a6d66e078413de72f8f050 *NAMESPACE
-d7f121c37f0ac0ea1c2d7e3f3b101af9 *NEWS.md
+683757f05e1f428ffcd7cd4f5b6a4186 *NEWS.md
 99b0f291e564f51c11399b2479fbe738 *R/conduct_conditional_ra.R
-c4f927c9760750fd215ee653d79062c9 *R/conduct_ri.R
+4d2d17060fb2a29c50fdcd00a1b951a5 *R/conduct_ri.R
 33554d8d9a995a9b0efd1755d76ca7b9 *R/conduct_ri_ATE.R
 6cb6564033e2440507b018cb12a0ad6e *R/conduct_ri_f.R
 9190589989a2b89a682082d255deec8c *R/conduct_ri_test_function.R
@@ -11,13 +11,10 @@ c4f927c9760750fd215ee653d79062c9 *R/conduct_ri.R
 7fb0d711f91fb20555908da71f78e98d *R/reexports.R
 66ea55155a88122846752b9190ef161b *R/ri2.R
 d798ad0842bf26b0e75c034e899959e3 *R/switching_equation.R
-39f95aebb01f0dbcd0435726938cd190 *build/vignette.rds
+0c9dc603e60d3a72e1c081b0f2745718 *build/vignette.rds
 7a45ff282e9a1fbb18260022b3eee599 *inst/doc/ri2_vignette.R
 d998c108005e3eed6cf7f1a221306d89 *inst/doc/ri2_vignette.Rmd
-b003ffab8d15d62998b1909f52eeba1f *inst/doc/ri2_vignette.html
-e15de7bfc8c8aed531feaefb9602694c *inst/doc/ri2_vs_ri.R
-ea8a4145922d0155fcc96889b28a9b15 *inst/doc/ri2_vs_ri.Rmd
-1df3b2fede478321222b306ebcc57c00 *inst/doc/ri2_vs_ri.html
+5a6f708a3c5ec1cf43fa1e4c6afca113 *inst/doc/ri2_vignette.html
 bfbaa177443f9963309eb1b6eda6aafc *man/conduct_ri.Rd
 5622baae0de1f281f08c44cdd9a5df88 *man/figures/EGAP_logo.jpg
 fefcbc55a204d3fdf5932d3018323de7 *man/figures/EGAP_logo_NoBackground.png
@@ -25,7 +22,7 @@ c29e44e700e69aefc5db3019cf39057a *man/reexports.Rd
 c72fc8b1649771725e1de45669323bb1 *man/ri2.Rd
 9ce3a8bf49990c495297330b1085eae2 *tests/testthat.R
 d1cee7a7549a9cbe4ea09d202956b132 *tests/testthat/test-blocked.R
-ead1ab8a95bccc119b2fdd88c78920bd *tests/testthat/test-compare-ri.R
+4025620f1513ca320438d66c5acc0c72 *tests/testthat/test-compare-ri.R
 a1fb14cd630367611880e840c036a723 *tests/testthat/test-conduct_conditional_ra.R
 29086b49f0acde7cf74ce57efb9e67b7 *tests/testthat/test-diff_variances.R
 9a5a970b8082068fd74f3954b9fe65a6 *tests/testthat/test-f_stat.R
@@ -37,4 +34,3 @@ a046ae516784adb572828daa62387dd0 *tests/testthat/test-progress_bar.R
 49df40542f0647c7d5fba8a1daee7187 *tests/testthat/test-studentize.R
 fc19c73f8e10292bbdaf47fc1f811210 *tests/testthat/test-two-arm.R
 d998c108005e3eed6cf7f1a221306d89 *vignettes/ri2_vignette.Rmd
-ea8a4145922d0155fcc96889b28a9b15 *vignettes/ri2_vs_ri.Rmd
